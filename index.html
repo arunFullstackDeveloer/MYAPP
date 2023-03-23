@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Plazi Store</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+    <!-- Brand/logo -->
+    <a class="navbar-brand" href="#">PlaziStore</a>
+
+    <!-- Links -->
+    <ul class="navbar-nav">
+      <li class="nav-item">
+        <a class="nav-link" href="index.html">AllProducts</a>
+      </li>
+
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown" onclick="catList();">
+          Categories
+        </a>
+        <div class="dropdown-menu" id="catList">
+
+        </div>
+      </li>
+    </ul>
+
+  </nav>
+
+  <div class="container">
+    <div class="row" id="cardData">
+
+    </div>
+
+
+    <!-- The Modal -->
+
+    <div class="modal bg-primery fade" id="myModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+
+          <!-- Modal Header -->
+          <div class="modal-header">
+            <h4 class="modal-title" id="title" style="color: black;"> </h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+
+          <!-- Modal body -->
+          <div class="modal-body">
+
+            <!-- slidebar  -->
+
+            <div id="demo" class="carousel slide" data-ride="carousel">
+
+              <!-- Indicators -->
+              <ul class="carousel-indicators">
+                <li data-target="#demo" data-slide-to="0" class="active"></li>
+                <li data-target="#demo" data-slide-to="1"></li>
+                <li data-target="#demo" data-slide-to="2"></li>
+              </ul>
+
+              <!-- The slideshow -->
+              <div class="carousel-inner">
+                <div class="carousel-item active">
+                  <img src="" alt="Loading" id="img1" style="width: 100%; height: 250px;">
+                </div>
+                <div class="carousel-item">
+                  <img src="" alt="Loading" id="img2" style="width: 100%; height: 250px;">
+                </div>
+                <div class="carousel-item">
+                  <img src="" alt="Loading" id="img3" style="width: 100%; height: 250px;">
+                </div>
+               
+              </div>
+
+              <!-- Left and right controls -->
+              <a class="carousel-control-prev " href="#demo" data-slide="prev">
+                <span class="carousel-control-prev-icon" style="background-color: black;"></span>
+              </a>
+              <a class="carousel-control-next" href="#demo" data-slide="next">
+                <span class="carousel-control-next-icon" style="background-color: black;"></span>
+              </a>
+
+            </div>
+            <div class="row">
+              <div class="col-sm-4">ID</div>
+              <div class="col-sm-6" id="ID"> </div>
+             
+              <div class="col-sm-4">PRICE</div>
+              <div class="col-sm-6" id="price"> </div>
+              <div class="col-sm-4">DESCRIPTION</div>
+              <div class="col-sm-6" id="description"> </div>
+              <div class="col-sm-4">CATEGORY ID</div>
+              <div class="col-sm-6" id="categoryid"> </div>
+              <div class="col-sm-4">CATEGORY NAME</div>
+              <div class="col-sm-6" id="category"> </div>
+            </div>
+
+          </div>
+
+          <!-- Modal footer -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      function allDataFun() {
+        let allData = "";
+        let url = `https://api.escuelajs.co/api/v1/products`
+        axios.get(url).then((resolve) => {
+          // console.log(resolve.data)
+          resolve.data.slice(0,20).forEach((items, index) => {
+            allData += `<div class=col-sm-4 style="padding:10px"><div class="card" >
+                          <div style="text-align:center"><img class="card-img-top" src="${items.images}" alt="Card image" style="height:300px; width:200px;"></div>
+                          <div class="card-body">
+                            <h4 class="card-title">${items.title.slice(0, 10)}...</h4>
+                            <p class="card-text">${items.description.slice(0, 40)} ...</p>
+                           <button class="btn btn-primary" onclick="openModal(${items.id})" data-toggle="modal" data-target="#myModal"> see Details</button>
+                           <button class="btn btn-primary" onclick="deleteData(${items.id})" > Delete</button>
+                          </div>
+                        </div>
+                        </div>`
+          })
+          document.getElementById("cardData").innerHTML = allData;
+        })
+      }
+      allDataFun();
+
+      function catList() {
+        let catList = "";
+        let url = `https://api.escuelajs.co/api/v1/categories`
+        axios.get(url).then((resolve) => {
+          // console.log(resolve.data[0].name)
+          resolve.data.slice(0, 7).forEach((items, index) => {
+            catList += `<a class="dropdown-item" href="#" onclick="cattype(${items.id})">${items.name}</a>`
+          })
+          document.getElementById("catList").innerHTML = catList;
+        })
+      }
+
+      function cattype(id) {
+        let filterData = "";
+        // console.log(e.innerText)
+        let url = `https://api.escuelajs.co/api/v1/categories/${id}/products`
+        axios.get(url).then((resolve) => {
+          // console.log(resolve.data)
+          resolve.data.forEach((items, index) => {
+            filterData += `<div class=col-sm-4 style="padding:10px"><div class="card" >
+                          <div style="text-align:center"><img class="card-img-top" src="${items.images}" alt="Card image" style="height:300px; width:200px;"></div>
+                          <div class="card-body">
+                            <h4 class="card-title">${items.title.slice(0, 10)}...</h4>
+                            <p class="card-text">${items.description.slice(0, 40)} ...</p>
+                           <button class="btn btn-primary" onclick="openModal(${items.id})" data-toggle="modal" data-target="#myModal" > see Details</button>
+                           <button class="btn btn-primary" onclick="deleteData(${items.id})"  > Delete</button>
+                          </div>
+                        </div>
+                        </div>`
+          })
+          document.getElementById("cardData").innerHTML = filterData;
+        })
+      }
+      
+
+      function openModal(id) {
+        let url = `https://api.escuelajs.co/api/v1/products/${id}`
+        axios.get(url).then((resolve) => {
+          // console.log(id)
+          let singleData = resolve.data;
+          document.getElementById("ID").innerHTML = singleData.id
+          document.getElementById("title").innerHTML = singleData.title
+          document.getElementById("price").innerHTML = singleData.price
+          document.getElementById("description").innerHTML = singleData.description
+          document.getElementById("categoryid").innerHTML = singleData.category.id
+          document.getElementById("category").innerHTML = singleData.category.name
+         
+          document.getElementById("img1").src = singleData.images[0]
+          document.getElementById("img2").src = singleData.images[1]
+          document.getElementById("img3").src = singleData.images[2]
+         
+
+        })
+      }
+
+    function deleteData(id){
+      let url =`https://api.escuelajs.co/api/v1/products`
+      axios.get(url).then((resolve)=>{
+        console.log(resolve.data)
+       let newUrl= resolve.data.filter((items,index)=>{
+   return index != id
+        })
+        // console.log(newUrl)
+        let str="";
+        newUrl.forEach((items,index)=>{
+            str += `<div class=col-sm-4 style="padding:10px"><div class="card" >
+                          <div style="text-align:center"><img class="card-img-top" src="${items.images}" alt="Card image" style="height:300px; width:200px;"></div>
+                          <div class="card-body">
+                            <h4 class="card-title">${items.title.slice(0, 10)}...</h4>
+                            <p class="card-text">${items.description.slice(0, 40)} ...</p>
+                           <button class="btn btn-primary" onclick="openModal(${items.id})" data-toggle="modal" data-target="#myModal"> see Details</button>
+                           <button class="btn btn-primary"  onclick="deleteData(${items.id})"> Delete</button>
+                          </div>
+                        </div>
+                        </div>`
+        })
+        document.getElementById("cardData").innerHTML = str;
+      })
+    }
+    </script>
+</body>
+
+</html>
